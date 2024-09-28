@@ -22,12 +22,9 @@ const gulp = require('gulp'),
 	spawn = require('cross-spawn'),
 	fs = require('fs'),
 	path = require('path'),
-	YAML = require('yaml'),
 	yargs = require('yargs/yargs'),
 	cp = require('child_process'),
 	pkg = require('./package.json'),
-	iconsTags = require('./node_modules/@tabler/icons/tags.json'),
-	iconsPkg = require('./node_modules/@tabler/icons/package.json'),
 	year = new Date().getFullYear(),
 	argv = yargs(process.argv).argv
 
@@ -74,76 +71,6 @@ if (!Array.prototype.flat) {
 		}
 	})
 }
-
-/**
- * Import tabler-icons form npm and generate Jekyll `.yml` data files
- */
-gulp.task('svg-icons', (cb) => {
-	const prepareSvgFile = (svg) => {
-		return svg.replace(/\n/g, '').replace(/>\s+</g, '><')
-	}
-
-	let svgList = {}
-	for (let iconName in iconsTags) {
-		let iconData = iconsTags[iconName]
-		svgList[iconName] = {
-			name: iconName,
-			version: iconData.version,
-			category: iconData.category,
-			tags: iconData.tags,
-			unicode: iconData.unicode,
-			svg: prepareSvgFile(fs
-				.readFileSync(
-					path.join(
-						__dirname,
-						`./node_modules/@tabler/icons/icons/${iconName}.svg`
-					)
-				)
-				.toString())
-
-		}
-	}
-
-	fs.writeFileSync(
-		path.join(__dirname, `${srcDir}/pages/_data/icons-info.json`),
-		JSON.stringify({
-			version: iconsPkg.version,
-			count: Object.keys(svgList).length,
-		})
-	)
-
-	fs.writeFileSync(`${srcDir}/pages/_data/icons.json`, JSON.stringify(svgList))
-
-	cb()
-})
-
-/**
- * Generate CHANGELOG.md
- */
-gulp.task('changelog', (cb) => {
-	const content = YAML.parse(fs.readFileSync('./src/pages/_data/changelog.yml', 'utf8')).reverse()
-	let readme = `# Changelog
-
-All notable changes to this project will be documented in this file.\n`
-
-	content.forEach((change) => {
-		readme += `\n\n## \`${change.version}\` - ${change.date}\n\n`
-
-		if (change.description) {
-			readme += `**${change.description}**\n\n`
-		}
-
-		change.changes.forEach((line) => {
-			readme += `- ${line}\n`
-		})
-
-		console.log(change.version);
-	})
-
-	fs.writeFileSync('CHANGELOG.md', readme)
-
-	cb()
-})
 
 /**
  * Check unused Jekyll partials
@@ -206,7 +133,10 @@ gulp.task('sass', () => {
 
 				return { file: url }
 			},
-		}).on('error', sass.logError))
+		}))
+			.on('error', function (err) {
+				throw err;
+			})
 		.pipe(postcss([
 			require('autoprefixer'),
 		]))
@@ -367,7 +297,7 @@ gulp.task('mjs', () => {
  */
 gulp.task('watch-jekyll', (cb) => {
 	browserSync.notify('Building Jekyll')
-	return spawn('bundle', ['exec', 'jekyll', 'build', '--watch', '--incremental', '--destination', demoDir, '--trace'], { stdio: 'inherit' })
+	return spawn('bundle', ['exec', 'jekyll', 'build', '--watch', '--destination', demoDir, '--trace'], { stdio: 'inherit' })
 		.on('close', cb)
 })
 

@@ -173,6 +173,9 @@ base:
     tables:
       url: tables.html
       title: Tables
+    toasts:
+      title: Toasts
+      url: toasts.html
     typography:
       title: Typography
       url: typography.html
@@ -324,9 +327,14 @@ icons:
   url: icons.html
 
 emails:
-  title: "Email templates"
+  title: "Emails"
   icon: mail-opened
   url: emails.html
+
+illustrations:
+  title: "Illustrations"
+  icon: brand-figma
+  url: illustrations.html
 
 help:
   title: Help

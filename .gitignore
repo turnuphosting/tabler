@@ -12,8 +12,6 @@ node_modules/
 /.cache/
 .sass-cache/
 
-.vscode/
-
 /_gh_pages/
 /site/docs/**/dist/
 /site/static/**/dist/
@@ -31,3 +29,6 @@ node_modules/
 .next
 .vercel
 package-lock.json
+
+demo/
+dist/
